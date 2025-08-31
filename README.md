@@ -1,6 +1,4 @@
-Explorations into training a ChatGPT, but tailored towards primary care medicine, with the reward being able to collect patient histories in a thorough and efficient manner and come up with a differential diagnosis. May also explore to see if it can be further fine-tuned on pirated copies of Up-To-Date for specialist knowledge
-
-Sadly, I no longer think this is possible in its current state. It will probably see some utility with scribing of basic bread and butter cases; however assess and plan it cannot.
+Explorations into training LLMs to use clinical calculators from patient history, using open sourced models. Will start with Wells' Criteria
 
 ## Citations
 
