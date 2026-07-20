@@ -32,7 +32,7 @@ Explorations into training LLMs to use clinical calculators from patient history
     keywords = {Human-Computer Interaction (cs.HC), FOS: Computer and information sciences, FOS: Computer and information sciences},
     title   = {Putting ChatGPT's Medical Advice to the (Turing) Test},
     publisher = {arXiv},
-    year    = {2023},  
+    year    = {2023},
     copyright = {Creative Commons Attribution Share Alike 4.0 International}
 }
 ```
@@ -58,5 +58,17 @@ Explorations into training LLMs to use clinical calculators from patient history
     title   = {Capabilities of GPT-4 on Medical Challenge Problems},
     author  = {Harsha Nori and Nicholas King and Scott Mayer McKinney and Dean Carignan and Eric Horvitz},
     year    = {2023}
+}
+```
+
+```bibtex
+@misc{dai2025sgrpoearlyexitreinforcement,
+    title   = {S-GRPO: Early Exit via Reinforcement Learning in Reasoning Models},
+    author  = {Muzhi Dai and Chenxu Yang and Qingyi Si},
+    year    = {2025},
+    eprint  = {2505.07686},
+    archivePrefix = {arXiv},
+    primaryClass = {cs.AI},
+    url     = {https://arxiv.org/abs/2505.07686},
 }
 ```
