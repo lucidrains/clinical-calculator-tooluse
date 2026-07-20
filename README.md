@@ -72,3 +72,12 @@ Explorations into training LLMs to use clinical calculators from patient history
     url     = {https://arxiv.org/abs/2505.07686},
 }
 ```
+
+```bibtex
+@misc{tensorlabbet_medqaswe_2026,
+    title   = {MedQASWE Post-Training},
+    author  = {Taro Langner},
+    year    = {2026},
+    url     = {https://tensorlabbet.com/2026/07/19/medqaswe_post_training/}
+}
+```
