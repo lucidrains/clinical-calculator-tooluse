@@ -1,3 +1,4 @@
+from math import sqrt, log
 from enum import Enum
 from typing import NamedTuple
 
@@ -21,6 +22,12 @@ class DVTThreeTierRisk(str, Enum):
     MODERATE = "Moderate Risk"
     HIGH = "High Risk"
 
+class DAS28DiseaseActivity(str, Enum):
+    REMISSION = "Remission"
+    LOW = "Low Disease Activity"
+    MODERATE = "Moderate Disease Activity"
+    HIGH = "High Disease Activity"
+
 # return types
 
 class PEResult(NamedTuple):
@@ -32,6 +39,10 @@ class DVTResult(NamedTuple):
     score: float
     two_tier_risk: DVTTwoTierRisk
     three_tier_risk: DVTThreeTierRisk
+
+class DAS28Result(NamedTuple):
+    score: float
+    disease_activity: DAS28DiseaseActivity
 
 # weights
 
@@ -89,3 +100,34 @@ def wells_criteria_dvt(**kwargs) -> DVTResult:
     )
 
     return DVTResult(score, two_tier, three_tier)
+
+# rheumatoid arthritis
+
+def das28_activity(score: float) -> DAS28DiseaseActivity:
+    return (
+        DAS28DiseaseActivity.REMISSION if score <= 2.6 else
+        DAS28DiseaseActivity.LOW if score <= 3.2 else
+        DAS28DiseaseActivity.MODERATE if score <= 5.1 else
+        DAS28DiseaseActivity.HIGH
+    )
+
+def das28_esr(tender_count: int, swollen_count: int, esr: float, global_health: float) -> DAS28Result:
+    # esr
+    score = (
+        0.56 * sqrt(tender_count) +
+        0.28 * sqrt(swollen_count) +
+        0.70 * log(esr) +
+        0.014 * global_health
+    )
+    return DAS28Result(score, das28_activity(score))
+
+def das28_crp(tender_count: int, swollen_count: int, crp: float, global_health: float) -> DAS28Result:
+    # crp
+    score = (
+        0.56 * sqrt(tender_count) +
+        0.28 * sqrt(swollen_count) +
+        0.36 * log(crp + 1) +
+        0.014 * global_health +
+        0.96
+    )
+    return DAS28Result(score, das28_activity(score))

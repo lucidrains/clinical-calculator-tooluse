@@ -1,5 +1,11 @@
 import pytest
-from medical_chatgpt.calculators import wells_criteria_pe, wells_criteria_dvt, PETwoTierRisk, PEThreeTierRisk, DVTTwoTierRisk, DVTThreeTierRisk
+import math
+from medical_chatgpt.calculators import (
+    wells_criteria_pe, wells_criteria_dvt,
+    PETwoTierRisk, PEThreeTierRisk,
+    DVTTwoTierRisk, DVTThreeTierRisk,
+    das28_esr, das28_crp, DAS28DiseaseActivity
+)
 
 def test_wells_criteria_pe_low_risk():
     result = wells_criteria_pe()
@@ -52,3 +58,13 @@ def test_wells_criteria_dvt_moderate():
     assert result.score == 1
     assert result.two_tier_risk == DVTTwoTierRisk.UNLIKELY
     assert result.three_tier_risk == DVTThreeTierRisk.MODERATE
+
+def test_das28_esr():
+    result = das28_esr(tender_count=8, swollen_count=4, esr=30, global_health=50)
+    assert math.isclose(result.score, 5.22, abs_tol=0.01)
+    assert result.disease_activity == DAS28DiseaseActivity.HIGH
+
+def test_das28_crp():
+    result = das28_crp(tender_count=8, swollen_count=4, crp=10, global_health=50)
+    assert math.isclose(result.score, 4.67, abs_tol=0.01)
+    assert result.disease_activity == DAS28DiseaseActivity.MODERATE
