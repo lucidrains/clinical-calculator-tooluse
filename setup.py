@@ -1,15 +1,15 @@
 from setuptools import setup, find_packages
 
 setup(
-  name = 'medical-chatgpt',
+  name = 'clinical-calculator-tooluse',
   packages = find_packages(exclude=[]),
   version = '0.0.1',
   license='MIT',
-  description = 'Medical ChatGPT',
+  description = 'Clinical Calculator Tool Use',
   author = 'Phil Wang',
   author_email = 'lucidrains@gmail.com',
   long_description_content_type = 'text/markdown',
-  url = 'https://github.com/lucidrains/medical-chatgpt',
+  url = 'https://github.com/lucidrains/clinical-calculator-tooluse',
   keywords = [
     'artificial intelligence',
     'deep learning',
@@ -18,9 +18,9 @@ setup(
     'reinforcement learning with human feedback'
   ],
   install_requires=[
-    'einops>=0.6',
+    'einops>=0.8',
     'django-ninja',
-    'torch>=1.6',
+    'torch>=2.4',
   ],
   classifiers=[
     'Development Status :: 4 - Beta',

@@ -4,7 +4,7 @@ from torch.nn import Module
 
 from x_transformers import TransformerWrapper, Decoder, AutoregressiveWrapper
 
-from medical_chatgpt.sgrpo import (
+from clinical_calculator_tooluse.sgrpo import (
     generate_sgrpo_rollouts,
     compute_sgrpo_advantages,
     SGRPOLoss
@@ -99,3 +99,22 @@ def test_sgrpo():
 
     loss.backward()
     assert exists(policy_logprobs.grad)
+
+def test_sgrpo_loss_with_mask():
+    loss_fn = SGRPOLoss(beta = 0.04, epsilon = 0.2)
+    policy_logprobs = torch.randn(2, 5, requires_grad = True)
+    ref_logprobs = torch.randn(2, 5)
+    advantages = torch.randn(2, 5)
+    mask = torch.tensor([[1, 1, 1, 0, 0], [1, 1, 1, 1, 0]], dtype = torch.bool)
+
+    loss = loss_fn(policy_logprobs, ref_logprobs, advantages, mask = mask)
+    assert loss.ndim == 0
+    loss.backward()
+    assert exists(policy_logprobs.grad)
+
+def test_attention_transformer():
+    from clinical_calculator_tooluse.transformer import Attention
+    attn = Attention(dim = 256, heads = 4, causal = True, num_null_kv = 2)
+    x = torch.randn(2, 16, 256)
+    out = attn(x)
+    assert out.shape == (2, 16, 256)

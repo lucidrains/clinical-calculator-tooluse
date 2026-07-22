@@ -1,10 +1,11 @@
 import pytest
 import math
-from medical_chatgpt.calculators import (
+from clinical_calculator_tooluse.calculators import (
     wells_criteria_pe, wells_criteria_dvt,
     PETwoTierRisk, PEThreeTierRisk,
     DVTTwoTierRisk, DVTThreeTierRisk,
-    das28_esr, das28_crp, DAS28DiseaseActivity
+    das28_esr, das28_crp, DAS28DiseaseActivity, cdai,
+    chads2_vasc, CHADSVASCRecommendation
 )
 
 def test_wells_criteria_pe_low_risk():
@@ -60,11 +61,45 @@ def test_wells_criteria_dvt_moderate():
     assert result.three_tier_risk == DVTThreeTierRisk.MODERATE
 
 def test_das28_esr():
-    result = das28_esr(tender_count=8, swollen_count=4, esr=30, global_health=50)
-    assert math.isclose(result.score, 5.22, abs_tol=0.01)
+    result = das28_esr(tender_count = 8, swollen_count = 4, esr = 30, global_health = 50)
+    assert math.isclose(result.score, 5.22, abs_tol = 0.01)
     assert result.disease_activity == DAS28DiseaseActivity.HIGH
 
 def test_das28_crp():
-    result = das28_crp(tender_count=8, swollen_count=4, crp=10, global_health=50)
-    assert math.isclose(result.score, 4.67, abs_tol=0.01)
+    result = das28_crp(tender_count = 8, swollen_count = 4, crp = 10, global_health = 50)
+    assert math.isclose(result.score, 4.67, abs_tol = 0.01)
     assert result.disease_activity == DAS28DiseaseActivity.MODERATE
+
+def test_cdai():
+    result = cdai(tender_count = 4, swollen_count = 2, patient_global = 3.5, provider_global = 2.5)
+    assert result.score == 12.0
+    assert result.disease_activity == DAS28DiseaseActivity.MODERATE
+
+def test_chads2_vasc_male_low_risk():
+    result = chads2_vasc()
+    assert result.score == 0
+    assert result.recommendation == CHADSVASCRecommendation.NONE
+
+def test_chads2_vasc_female_low_risk():
+    result = chads2_vasc(female_sex = True)
+    assert result.score == 1
+    assert result.recommendation == CHADSVASCRecommendation.NONE
+
+def test_chads2_vasc_male_consider():
+    result = chads2_vasc(hypertension = True)
+    assert result.score == 1
+    assert result.recommendation == CHADSVASCRecommendation.CONSIDER
+
+def test_chads2_vasc_female_consider():
+    result = chads2_vasc(female_sex = True, hypertension = True)
+    assert result.score == 2
+    assert result.recommendation == CHADSVASCRecommendation.CONSIDER
+
+def test_chads2_vasc_high_risk():
+    result = chads2_vasc(
+        stroke_or_tia = True,
+        age_75_or_older = True,
+        diabetes = True
+    )
+    assert result.score == 5
+    assert result.recommendation == CHADSVASCRecommendation.RECOMMENDED

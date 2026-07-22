@@ -34,7 +34,8 @@ class SGRPOLoss(Module):
         self,
         policy_logprobs,
         ref_logprobs,
-        advantages
+        advantages,
+        mask = None
     ):
         ratio = torch.exp(policy_logprobs - ref_logprobs)
         clipped_ratio = ratio.clamp(1. - self.epsilon, 1. + self.epsilon)
@@ -42,10 +43,15 @@ class SGRPOLoss(Module):
         surrogate1 = ratio * advantages
         surrogate2 = clipped_ratio * advantages
 
-        policy_loss = -torch.min(surrogate1, surrogate2).mean()
-
+        surrogate = torch.min(surrogate1, surrogate2)
         kl_div = torch.exp(ref_logprobs - policy_logprobs) - (ref_logprobs - policy_logprobs) - 1.
-        kl_loss = kl_div.mean() * self.beta
+
+        if exists(mask):
+            policy_loss = -(surrogate * mask).sum() / mask.sum().clamp(min = 1e-8)
+            kl_loss = (kl_div * mask).sum() / mask.sum().clamp(min = 1e-8) * self.beta
+        else:
+            policy_loss = -surrogate.mean()
+            kl_loss = kl_div.mean() * self.beta
 
         return policy_loss + kl_loss
 
@@ -75,6 +81,10 @@ def generate_sgrpo_rollouts(
     max_new_tokens = 1024
 ):
     model.eval()
+
+    if prompt_ids.ndim == 1:
+        prompt_ids = rearrange(prompt_ids, 'n -> 1 n')
+
     prompt_len = prompt_ids.shape[-1]
 
     outputs = model.generate(
@@ -85,7 +95,7 @@ def generate_sgrpo_rollouts(
         pad_token_id = tokenizer.eos_token_id
     )
 
-    full_seq = outputs.sequences[0]
+    full_seq = outputs.sequences[0] if hasattr(outputs, 'sequences') else outputs[0]
     gen_seq = full_seq[prompt_len:]
     seq_len = len(gen_seq)
 
@@ -107,8 +117,10 @@ def generate_sgrpo_rollouts(
             pad_token_id = tokenizer.eos_token_id
         )
 
+        branch_seq = branch_out.sequences[0] if hasattr(branch_out, 'sequences') else branch_out[0]
+
         rollouts.append(dict(
-            sequence = branch_out[0],
+            sequence = branch_seq,
             position = pos.item(),
             is_full = False
         ))
